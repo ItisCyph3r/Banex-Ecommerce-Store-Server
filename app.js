@@ -62,6 +62,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Routes
+app.use("/", (req, res, next) => {
+  res.send(`
+    <div style="display: flex; justify-content: center; align-items: centr; height: 100vh;">
+      <h1>Welcome to Banex Ecommerce Store API</h1>
+    </div>
+  `);
+});
 app.use("/api", authRouter);
 app.use("/api/user", usersRouter);
 app.use("/api/category", categoryRouter);

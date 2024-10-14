@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ItisCyph3r/Banex-Ecommerce-Store-Server"
+    "url": "https://github.com/ItisCyph3r/MERN_Stack_Project_Banex_Ecommerce"
   },
-  "author": "ItisCyph3r | https://github.com/ItisCyph3r",
+  "author": "ItisCyph3r | https://ItisCyph3r.github.io",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ItisCyph3r/Banex-Ecommerce-Store-Server/issues"
+    "url": "https://github.com/ItisCyph3r/MERN_Stack_Project_Banex_Ecommerce/issues"
   },
-  "homepage": "https://github.com/ItisCyph3r/Banex-Ecommerce-Store-Server#readme",
+  "homepage": "https://github.com/ItisCyph3r/MERN_Stack_Project_Banex_Ecommerce#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "braintree": "^3.0.0",
@@ -26,7 +26,7 @@
     "express": "^4.17.1",
     "i": "^0.3.6",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^8.7.1",
+    "mongoose": "^5.9.27",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "nodemon": "^2.0.4",

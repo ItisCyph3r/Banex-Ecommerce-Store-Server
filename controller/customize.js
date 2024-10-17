@@ -17,21 +17,45 @@ class Customize {
     }
   }
 
+  // async uploadSlideImage(req, res) {
+  //   let image = req.file.filename;
+  //   if (!image) {
+  //     return res.json({ error: "All field required" });
+  //   }
+  //   try {
+  //     console.log(`sadasdad ${image} sdadasdadsd`)
+  //     let newCustomzie = new customizeModel({
+  //       slideImage: image,
+  //     });
+  //     let save = await newCustomzie.save();
+  //     if (save) {
+  //       return res.json({ success: "Image upload successfully" });
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
+
   async uploadSlideImage(req, res) {
-    let image = req.file.filename;
-    if (!image) {
-      return res.json({ error: "All field required" });
+    // The image has been uploaded to both the local disk and Cloudinary at this point
+    let cloudinaryUrl = req.cloudinaryUrl; // Cloudinary URL passed from the previous middleware
+
+    if (!cloudinaryUrl) {
+      return res.json({ error: "Image upload failed" });
     }
+
     try {
-      let newCustomzie = new customizeModel({
-        slideImage: image,
+      let newCustomize = new customizeModel({
+        slideImage: cloudinaryUrl, // Save the Cloudinary URL in the database
       });
-      let save = await newCustomzie.save();
+
+      let save = await newCustomize.save();
       if (save) {
-        return res.json({ success: "Image upload successfully" });
+        return res.json({ success: "Image uploaded and saved successfully", url: cloudinaryUrl });
       }
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ error: "Error saving image to database" });
     }
   }
 

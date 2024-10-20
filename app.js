@@ -37,18 +37,18 @@ const { loginCheck } = require("./middleware/auth");
 const CreateAllFolder = require("./config/uploadFolderCreateScript");
 
 /* Create All Uploads Folder if not exists | For Uploading Images */
-CreateAllFolder();
+// CreateAllFolder();
 
 // Database Connection
 mongoose
   .connect(process.env.DATABASE, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true,
+    useCreateIndexes: true,
   })
   .then(() =>
     console.log(
-      "==============Mongodb Database Connected Successfully=============="
+      "==============Mongodb Database Connec  ted Successfully=============="
     )
   )
   .catch((err) => console.log("Database Not Connected !!!"));

@@ -854,12 +854,462 @@
 
 
 
+// const cloudinary = require("cloudinary").v2;
+// const mongoose = require("mongoose");
+// const { ObjectId } = mongoose.Schema.Types;
+// const productModel = require("../models/products");
+// const fs = require("fs");
+// const path = require("path");
+
+// // Cloudinary configuration
+// cloudinary.config({
+//   cloud_name: process.env.CLOUD_NAME,
+//   api_key: process.env.CLOUD_API_KEY,
+//   api_secret: process.env.CLOUD_API_SECRET,
+// });
+
+// class Product {
+//   // Helper to upload images to Cloudinary and remove local files
+//   static async uploadToCloudinary(filePath) {
+//     try {
+//       const result = await cloudinary.uploader.upload(filePath, {
+//         folder: "products",
+//       });
+//       // Delete the local file after uploading
+//       fs.unlinkSync(filePath);
+//       return result.secure_url; // Return the Cloudinary URL
+//     } catch (err) {
+//       console.error("Error uploading to Cloudinary:", err);
+//       throw err;
+//     }
+//   }
+
+//   // Delete Images from local uploads/products folder
+//   static deleteImages(images, mode) {
+//     var basePath = path.resolve(__dirname + "../../") + "/public/uploads/products/";
+//     for (var i = 0; i < images.length; i++) {
+//       let filePath = mode === "file" ? basePath + `${images[i].filename}` : basePath + `${images[i]}`;
+//       if (fs.existsSync(filePath)) {
+//         fs.unlink(filePath, (err) => {
+//           if (err) console.error("Error deleting image:", err);
+//         });
+//       }
+//     }
+//   }
+
+//   // Fetch all products
+//   async getAllProduct(req, res) {
+//     try {
+//       let Products = await productModel.find({}).populate("pCategory", "_id cName").sort({ _id: -1 });
+//       return res.json({ Products });
+//     } catch (err) {
+//       console.log(err);
+//       return res.status(500).json({ error: "Server error" });
+//     }
+//   }
+
+
+// async postAddProduct(req, res) {
+//   let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
+//   let images = req.files;
+
+//   if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+//     return res.json({ error: "All fields must be required" });
+//   }
+
+//   if (pName.length > 255 || pDescription.length > 3000) {
+//     return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+//   }
+
+//   if (images.length !== 2) {
+//     return res.json({ error: "Must provide exactly 2 images" });
+//   }
+
+//   try {
+//     let cloudinaryUrls = images.map(img => img.path); // Cloudinary URL for each image
+
+//     let newProduct = new productModel({
+//       pImages: cloudinaryUrls, // Use Cloudinary URLs
+//       pName,
+//       pDescription,
+//       pPrice,
+//       pQuantity,
+//       pCategory,
+//       pOffer,
+//       pStatus,
+//     });
+
+//     let save = await newProduct.save();
+//     if (save) {
+//       return res.json({ success: "Product created successfully" });
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(500).json({ error: "Server error" });
+//   }
+// }
+
+
+
+
+
+
+
+
+// async postAddProduct(req, res) {
+//   let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
+//   let images = req.files;
+
+//   if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+//     return res.json({ error: "All fields must be required" });
+//   }
+
+//   if (pName.length > 255 || pDescription.length > 3000) {
+//     return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+//   }
+
+//   if (images.length !== 2) {
+//     return res.json({ error: "Must provide exactly 2 images" });
+//   }
+
+//   try {
+//     let cloudinaryUrls = images.map(img => img.path); // Cloudinary URL for each image
+
+//     let newProduct = new productModel({
+//       pImages: cloudinaryUrls, // Use Cloudinary URLs
+//       pName,
+//       pDescription,
+//       pPrice,
+//       pQuantity,
+//       pCategory,
+//       pOffer,
+//       pStatus,
+//     });
+
+//     let save = await newProduct.save();
+//     if (save) {
+//       return res.json({ success: "Product created successfully" });
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(500).json({ error: "Server error" });
+//   }
+// }
+
+
+//   // Edit product
+//   async postEditProduct(req, res) {
+//     let { pId, pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus, pImages } = req.body;
+//     let editImages = req.files;
+
+//     if (!pId || !pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+//       return res.json({ error: "All fields must be required" });
+//     }
+
+//     if (pName.length > 255 || pDescription.length > 3000) {
+//       return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+//     }
+
+//     if (editImages && editImages.length === 1) {
+//       Product.deleteImages(editImages, "file");
+//       return res.json({ error: "Must provide exactly 2 images" });
+//     }
+
+//     try {
+//       let editData = {
+//         pName,
+//         pDescription,
+//         pPrice,
+//         pQuantity,
+//         pCategory,
+//         pOffer,
+//         pStatus,
+//       };
+
+//       if (editImages && editImages.length === 2) {
+//         let newCloudinaryUrls = [];
+
+//         // Upload new images to Cloudinary
+//         for (const img of editImages) {
+//           const localPath = path.resolve("public/uploads/products", img.filename);
+//           const cloudinaryUrl = await Product.uploadToCloudinary(localPath);
+//           newCloudinaryUrls.push(cloudinaryUrl); // Save Cloudinary URLs
+//         }
+
+//         // Add new images to editData and delete old images
+//         editData.pImages = newCloudinaryUrls;
+//         Product.deleteImages(pImages.split(","), "string"); // Remove old images
+//       }
+
+//       let editProduct = await productModel.findByIdAndUpdate(pId, editData, { new: true });
+//       if (editProduct) {
+//         return res.json({ success: "Product edited successfully", product: editProduct });
+//       }
+//     } catch (err) {
+//       console.log(err);
+//       return res.status(500).json({ error: "Server error" });
+//     }
+//   }
+
+//   // Delete product
+//   async getDeleteProduct(req, res) {
+//     let { pId } = req.body;
+//     if (!pId) {
+//       return res.json({ error: "Product ID is required" });
+//     }
+
+//     try {
+//       let deleteProduct = await productModel.findByIdAndDelete(pId);
+//       if (deleteProduct) {
+//         Product.deleteImages(deleteProduct.pImages, "string"); // Delete images
+//         return res.json({ success: "Product deleted successfully" });
+//       }
+//     } catch (err) {
+//       console.log(err);
+//       return res.status(500).json({ error: "Server error" });
+//     }
+//   }
+
+//     async getSingleProduct(req, res) {
+//     let { pId } = req.body;
+//     if (!pId) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       try {
+//         let singleProduct = await productModel
+//           .findById(pId)
+//           .populate("pCategory", "cName")
+//           .populate("pRatingsReviews.user", "name email userImage");
+//         if (singleProduct) {
+//           return res.json({ Product: singleProduct });
+//         }
+//       } catch (err) {
+//         console.log(err);
+//       }
+//     }
+//   }
+
+//   async getProductByCategory(req, res) {
+//     let { catId } = req.body;
+//     if (!catId) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       try {
+//         let products = await productModel
+//           .find({ pCategory: catId })
+//           .populate("pCategory", "cName");
+//         if (products) {
+//           return res.json({ Products: products });
+//         }
+//       } catch (err) {
+//         return res.json({ error: "Search product wrong" });
+//       }
+//     }
+//   }
+
+//   async getProductByPrice(req, res) {
+//     let { price } = req.body;
+//     if (!price) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       try {
+//         let products = await productModel
+//           .find({ pPrice: { $lt: price } })
+//           .populate("pCategory", "cName")
+//           .sort({ pPrice: -1 });
+//         if (products) {
+//           return res.json({ Products: products });
+//         }
+//       } catch (err) {
+//         return res.json({ error: "Filter product wrong" });
+//       }
+//     }
+//   }
+
+//   async getWishProduct(req, res) {
+//     let { productArray } = req.body;
+//     if (!productArray) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       try {
+//         let wishProducts = await productModel.find({
+//           _id: { $in: productArray },
+//         });
+//         if (wishProducts) {
+//           return res.json({ Products: wishProducts });
+//         }
+//       } catch (err) {
+//         return res.json({ error: "Filter product wrong" });
+//       }
+//     }
+//   }
+
+//   async getCartProduct(req, res) {
+//     let { productArray } = req.body;
+//     if (!productArray) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       try {
+//         let cartProducts = await productModel.find({
+//           _id: { $in: productArray },
+//         });
+//         if (cartProducts) {
+//           return res.json({ Products: cartProducts });
+//         }
+//       } catch (err) {
+//         return res.json({ error: "Cart product wrong" });
+//       }
+//     }
+//   }
+
+//   async postAddReview(req, res) {
+//     let { pId, uId, rating, review } = req.body;
+//     if (!pId || !rating || !review || !uId) {
+//       return res.json({ error: "All filled must be required" });
+//     } else {
+//       let checkReviewRatingExists = await productModel.findOne({ _id: pId });
+//       if (checkReviewRatingExists.pRatingsReviews.length > 0) {
+//         checkReviewRatingExists.pRatingsReviews.map((item) => {
+//           if (item.user === uId) {
+//             return res.json({ error: "Your already reviewd the product" });
+//           } else {
+//             try {
+//               let newRatingReview = productModel.findByIdAndUpdate(pId, {
+//                 $push: {
+//                   pRatingsReviews: {
+//                     review: review,
+//                     user: uId,
+//                     rating: rating,
+//                   },
+//                 },
+//               });
+//               newRatingReview.exec((err, result) => {
+//                 if (err) {
+//                   console.log(err);
+//                 }
+//                 return res.json({ success: "Thanks for your review" });
+//               });
+//             } catch (err) {
+//               return res.json({ error: "Cart product wrong" });
+//             }
+//           }
+//         });
+//       } else {
+//         try {
+//           let newRatingReview = productModel.findByIdAndUpdate(pId, {
+//             $push: {
+//               pRatingsReviews: { review: review, user: uId, rating: rating },
+//             },
+//           });
+//           newRatingReview.exec((err, result) => {
+//             if (err) {
+//               console.log(err);
+//             }
+//             return res.json({ success: "Thanks for your review" });
+//           });
+//         } catch (err) {
+//           return res.json({ error: "Cart product wrong" });
+//         }
+//       }
+//     }
+//   }
+
+//   async deleteReview(req, res) {
+//     let { rId, pId } = req.body;
+//     if (!rId) {
+//       return res.json({ message: "All filled must be required" });
+//     } else {
+//       try {
+//         let reviewDelete = productModel.findByIdAndUpdate(pId, {
+//           $pull: { pRatingsReviews: { _id: rId } },
+//         });
+//         reviewDelete.exec((err, result) => {
+//           if (err) {
+//             console.log(err);
+//           }
+//           return res.json({ success: "Your review is deleted" });
+//         });
+//       } catch (err) {
+//         console.log(err);
+//       }
+//     }
+//   }
+// }
+
+
+// const productController = new Product();
+// module.exports = productController;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//   // Helper to upload images to Cloudinary and remove local files
+//   static async uploadToCloudinary(filePath) {
+//     try {
+//       const result = await cloudinary.uploader.upload(filePath, {
+//         folder: "products",
+//       });
+//       // Delete the local file after uploading
+//       fs.unlinkSync(filePath);
+//       return result.secure_url; // Return the Cloudinary URL
+//     } catch (err) {
+//       console.error("Error uploading to Cloudinary:", err);
+//       throw err;
+//     }
+//   }
+
+//   // Delete Images from local uploads/products folder
+//   static deleteImages(images, mode) {
+//     var basePath = path.resolve(__dirname + "../../") + "/public/uploads/products/";
+//     for (var i = 0; i < images.length; i++) {
+//       let filePath = mode === "file" ? basePath + `${images[i].filename}` : basePath + `${images[i]}`;
+//       if (fs.existsSync(filePath)) {
+//         fs.unlink(filePath, (err) => {
+//           if (err) console.error("Error deleting image:", err);
+//         });
+//       }
+//     }
+//   }
+
+
+
+
+
+// controller/products.js
 const cloudinary = require("cloudinary").v2;
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema.Types;
 const productModel = require("../models/products");
 const fs = require("fs");
 const path = require("path");
+const streamifier = require('streamifier'); // Add this to the top
+const { toTitleCase } = require("../config/function");
 
 // Cloudinary configuration
 cloudinary.config({
@@ -869,38 +1319,36 @@ cloudinary.config({
 });
 
 class Product {
-  // Helper to upload images to Cloudinary and remove local files
-  static async uploadToCloudinary(filePath) {
-    try {
-      const result = await cloudinary.uploader.upload(filePath, {
-        folder: "products",
-      });
-      // Delete the local file after uploading
-      fs.unlinkSync(filePath);
-      return result.secure_url; // Return the Cloudinary URL
-    } catch (err) {
-      console.error("Error uploading to Cloudinary:", err);
-      throw err;
-    }
-  }
+  // Helper to upload images to Cloudinary
+  static async uploadToCloudinary(buffer) {
+    // try {
+    //   const result = await cloudinary.uploader.upload_stream({
+    //     folder: "products",
+    //   });
+    //   return new Promise((resolve, reject) => {
+    //     const stream = result.createReadStream({ buffer });
+    //     stream.on("end", () => resolve(result.secure_url));
+    //     stream.on("error", reject);
+    //   });
+    // } catch (err) {
+    //   console.error("Error uploading to Cloudinary:", err);
+    //   throw err;
+    // }
 
-  // Delete Images from local uploads/products folder
-  static deleteImages(images, mode) {
-    var basePath = path.resolve(__dirname + "../../") + "/public/uploads/products/";
-    for (var i = 0; i < images.length; i++) {
-      let filePath = mode === "file" ? basePath + `${images[i].filename}` : basePath + `${images[i]}`;
-      if (fs.existsSync(filePath)) {
-        fs.unlink(filePath, (err) => {
-          if (err) console.error("Error deleting image:", err);
-        });
-      }
-    }
+
+
+    
+
+    
   }
 
   // Fetch all products
   async getAllProduct(req, res) {
     try {
-      let Products = await productModel.find({}).populate("pCategory", "_id cName").sort({ _id: -1 });
+      let Products = await productModel
+        .find({})
+        .populate("pCategory", "_id cName")
+        .sort({ _id: -1 });
       return res.json({ Products });
     } catch (err) {
       console.log(err);
@@ -908,56 +1356,203 @@ class Product {
     }
   }
 
-  // Add new product
-  async postAddProduct(req, res) {
-    let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
-    let images = req.files;
+// Add new product
+async postAddProduct(req, res) {
+  let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
+  let images = req.files;
 
-    if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
-      Product.deleteImages(images, "file");
-      return res.json({ error: "All fields must be required" });
+  if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+    return res.json({ error: "All fields must be required" });
+  }
+
+  if (pName.length > 255 || pDescription.length > 3000) {
+    return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+  }
+
+  if (images.length !== 2) {
+    return res.json({ error: "Must provide exactly 2 images" });
+  }
+
+  try {
+    // Check if the product name already exists
+    let checkProductExists = await productModel.findOne({ pName });
+    if (checkProductExists) {
+      return res.json({ error: "Product with this name already exists" });
     }
 
-    if (pName.length > 255 || pDescription.length > 3000) {
-      Product.deleteImages(images, "file");
-      return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
-    }
+    let cloudinaryUrls = [];
 
-    if (images.length !== 2) {
-      Product.deleteImages(images, "file");
-      return res.json({ error: "Must provide exactly 2 images" });
-    }
-
-    try {
-      let cloudinaryUrls = [];
-
-      // Upload images to Cloudinary
-      for (const img of images) {
-        const localPath = path.resolve("public/uploads/products", img.filename);
-        const cloudinaryUrl = await Product.uploadToCloudinary(localPath);
-        cloudinaryUrls.push(cloudinaryUrl); // Save Cloudinary URLs
-      }
-console.log(cloudinaryUrls)
-      let newProduct = new productModel({
-        pImages: cloudinaryUrls, // Use Cloudinary URLs
-        pName,
-        pDescription,
-        pPrice,
-        pQuantity,
-        pCategory,
-        pOffer,
-        pStatus,
+    // Upload images to Cloudinary
+    for (const img of images) {
+      // Ensure each image is uploaded separately
+      const cloudinaryResult = await cloudinary.uploader.upload(img.path, {
+        folder: "banex/products",
+        use_filename: true,
       });
 
-      let save = await newProduct.save();
-      if (save) {
-        return res.json({ success: "Product created successfully" });
-      }
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json({ error: "Server error" });
+      // Push the individual result secure_url to the array
+      cloudinaryUrls.push(cloudinaryResult.secure_url);
     }
+
+    // Convert pName to title case
+    pName = toTitleCase(pName);
+
+    // Create the new product
+    let newProduct = new productModel({
+      pImages: cloudinaryUrls, // Save all Cloudinary URLs
+      pName,
+      pDescription,
+      pPrice,
+      pQuantity,
+      pCategory,
+      pOffer,
+      pStatus,
+    });
+
+    // Save the new product
+    let save = await newProduct.save();
+    if (save) {
+      return res.json({ success: "Product created successfully" });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Server error" });
   }
+}
+
+
+
+
+//   // Add new product
+// async postAddProduct(req, res) {
+//   let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
+//   let images = req.files;
+
+//   if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+//     return res.json({ error: "All fields must be required" });
+//   }
+
+//   if (pName.length > 255 || pDescription.length > 3000) {
+//     return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+//   }
+
+//   if (images.length !== 2) {
+//     return res.json({ error: "Must provide exactly 2 images" });
+//   }
+
+//   try {
+//     // Check if the product name already exists
+//     let checkProductExists = await productModel.findOne({ pName });
+//     if (checkProductExists) {
+//       return res.json({ error: "Product with this name already exists" });
+//     }
+
+//     let cloudinaryUrls = [];
+
+//     // Upload images to Cloudinary
+//     for (const img of images) {
+//       const cloudinaryResult = await cloudinary.uploader.upload(img.path, {
+//         folder: "products",
+//         use_filename: true,
+//       });
+//       cloudinaryUrls.push(cloudinaryResult.secure_url);
+//     }
+
+//     // Convert pName to title case
+//     pName = toTitleCase(pName);
+
+//     // Create the new product
+//     let newProduct = new productModel({
+//       pImages: cloudinaryUrls, // Save all Cloudinary URLs
+//       pName,
+//       pDescription,
+//       pPrice,
+//       pQuantity,
+//       pCategory,
+//       pOffer,
+//       pStatus,
+//     });
+
+//     // Save the new product
+//     let save = await newProduct.save();
+//     if (save) {
+//       return res.json({ success: "Product created successfully" });
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(500).json({ error: "Server error" });
+//   }
+// }
+
+
+  // // Add new product
+  // async postAddProduct(req, res) {
+  //   let { pName, pDescription, pPrice, pQuantity, pCategory, pOffer, pStatus } = req.body;
+  //   let images = req.files;
+
+  //   if (!pName || !pDescription || !pPrice || !pQuantity || !pCategory || !pStatus) {
+  //     return res.json({ error: "All fields must be required" });
+  //   }
+
+  //   if (pName.length > 255 || pDescription.length > 3000) {
+  //     return res.json({ error: "Name must not exceed 255 characters and description must not exceed 3000 characters" });
+  //   }
+
+  //   if (images.length !== 2) {
+  //     return res.json({ error: "Must provide exactly 2 images" });
+  //   }
+
+  //   try {
+  //     let cloudinaryUrls = [];
+
+  //     // Upload images to Cloudinary
+  //     for (const img of images) {
+
+
+  //       let checkProductExists = await productModel.findOne({ pName });
+  //       if (checkProductExists) {
+  //         // If category exists, delete uploaded image from Cloudinary
+  //         await cloudinary.uploader.destroy(cloudinaryResult.public_id);
+  //         return res.json({ error: "Category already exists" });
+  //       }
+
+  //       const cloudinaryResult = await cloudinary.uploader.upload(img.path, {
+  //         folder: "products",
+  //         use_filename: true,
+  //       });
+
+  //       cloudinaryUrls.push(cloudinaryResult)
+
+
+  //     }
+
+  //     pName = toTitleCase(pName);
+
+  //     console.log(cloudinaryUrls)
+
+  //     let newProduct = new productModel({
+  //       pImages: {
+  //         public_id: cloudinaryResult[0].public_id,
+  //         url: cloudinaryResult[0].secure_url,
+  //       },
+  //       pName,
+  //       pDescription,
+  //       pPrice,
+  //       pQuantity,
+  //       pCategory,
+  //       pOffer,
+  //       pStatus,
+  //     });
+
+  //     let save = await newProduct.save();
+  //     if (save) {
+  //       return res.json({ success: "Product created successfully" });
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(500).json({ error: "Server error" });
+  //   }
+  // }
 
   // Edit product
   async postEditProduct(req, res) {
@@ -973,7 +1568,6 @@ console.log(cloudinaryUrls)
     }
 
     if (editImages && editImages.length === 1) {
-      Product.deleteImages(editImages, "file");
       return res.json({ error: "Must provide exactly 2 images" });
     }
 
@@ -993,14 +1587,12 @@ console.log(cloudinaryUrls)
 
         // Upload new images to Cloudinary
         for (const img of editImages) {
-          const localPath = path.resolve("public/uploads/products", img.filename);
-          const cloudinaryUrl = await Product.uploadToCloudinary(localPath);
+          const cloudinaryUrl = await Product.uploadToCloudinary(img.buffer);
           newCloudinaryUrls.push(cloudinaryUrl); // Save Cloudinary URLs
         }
 
-        // Add new images to editData and delete old images
+        // Add new images to editData
         editData.pImages = newCloudinaryUrls;
-        Product.deleteImages(pImages.split(","), "string"); // Remove old images
       }
 
       let editProduct = await productModel.findByIdAndUpdate(pId, editData, { new: true });
@@ -1023,7 +1615,6 @@ console.log(cloudinaryUrls)
     try {
       let deleteProduct = await productModel.findByIdAndDelete(pId);
       if (deleteProduct) {
-        Product.deleteImages(deleteProduct.pImages, "string"); // Delete images
         return res.json({ success: "Product deleted successfully" });
       }
     } catch (err) {
@@ -1032,10 +1623,11 @@ console.log(cloudinaryUrls)
     }
   }
 
-    async getSingleProduct(req, res) {
+  // Fetch single product
+  async getSingleProduct(req, res) {
     let { pId } = req.body;
     if (!pId) {
-      return res.json({ error: "All filled must be required" });
+      return res.json({ error: "All fields must be required" });
     } else {
       try {
         let singleProduct = await productModel
@@ -1051,10 +1643,11 @@ console.log(cloudinaryUrls)
     }
   }
 
+  // Fetch products by category
   async getProductByCategory(req, res) {
     let { catId } = req.body;
     if (!catId) {
-      return res.json({ error: "All filled must be required" });
+      return res.json({ error: "All fields must be required" });
     } else {
       try {
         let products = await productModel
@@ -1069,24 +1662,73 @@ console.log(cloudinaryUrls)
     }
   }
 
+  // Fetch products by price
   async getProductByPrice(req, res) {
     let { price } = req.body;
     if (!price) {
-      return res.json({ error: "All filled must be required" });
+      return res.json({ error: "All fields must be required" });
     } else {
       try {
         let products = await productModel
           .find({ pPrice: { $lt: price } })
-          .populate("pCategory", "cName")
-          .sort({ pPrice: -1 });
+          .populate("pCategory", "cName");
         if (products) {
           return res.json({ Products: products });
         }
       } catch (err) {
-        return res.json({ error: "Filter product wrong" });
+        console.log(err);
       }
     }
   }
+
+  // Add a review to a product
+  async postAddReview(req, res) {
+    let { review, userId, rating, pId } = req.body;
+    if (!review || !userId || !rating || !pId) {
+      return res.json({ error: "All fields must be required" });
+    } else {
+      try {
+        let reviewData = {
+          review,
+          user: userId,
+          rating,
+        };
+
+        let saveReview = await productModel.findByIdAndUpdate(
+          pId,
+          { $push: { pRatingsReviews: reviewData } },
+          { new: true }
+        );
+        if (saveReview) {
+          return res.json({ success: "Review added successfully" });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  // Delete review
+  async deleteReview(req, res) {
+    let { pId, reviewId } = req.body;
+    if (!pId || !reviewId) {
+      return res.json({ error: "All fields must be required" });
+    } else {
+      try {
+        let deleteReview = await productModel.findByIdAndUpdate(
+          pId,
+          { $pull: { pRatingsReviews: { _id: reviewId } } },
+          { new: true }
+        );
+        if (deleteReview) {
+          return res.json({ success: "Review deleted successfully" });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
 
   async getWishProduct(req, res) {
     let { productArray } = req.body;
@@ -1123,80 +1765,8 @@ console.log(cloudinaryUrls)
       }
     }
   }
-
-  async postAddReview(req, res) {
-    let { pId, uId, rating, review } = req.body;
-    if (!pId || !rating || !review || !uId) {
-      return res.json({ error: "All filled must be required" });
-    } else {
-      let checkReviewRatingExists = await productModel.findOne({ _id: pId });
-      if (checkReviewRatingExists.pRatingsReviews.length > 0) {
-        checkReviewRatingExists.pRatingsReviews.map((item) => {
-          if (item.user === uId) {
-            return res.json({ error: "Your already reviewd the product" });
-          } else {
-            try {
-              let newRatingReview = productModel.findByIdAndUpdate(pId, {
-                $push: {
-                  pRatingsReviews: {
-                    review: review,
-                    user: uId,
-                    rating: rating,
-                  },
-                },
-              });
-              newRatingReview.exec((err, result) => {
-                if (err) {
-                  console.log(err);
-                }
-                return res.json({ success: "Thanks for your review" });
-              });
-            } catch (err) {
-              return res.json({ error: "Cart product wrong" });
-            }
-          }
-        });
-      } else {
-        try {
-          let newRatingReview = productModel.findByIdAndUpdate(pId, {
-            $push: {
-              pRatingsReviews: { review: review, user: uId, rating: rating },
-            },
-          });
-          newRatingReview.exec((err, result) => {
-            if (err) {
-              console.log(err);
-            }
-            return res.json({ success: "Thanks for your review" });
-          });
-        } catch (err) {
-          return res.json({ error: "Cart product wrong" });
-        }
-      }
-    }
-  }
-
-  async deleteReview(req, res) {
-    let { rId, pId } = req.body;
-    if (!rId) {
-      return res.json({ message: "All filled must be required" });
-    } else {
-      try {
-        let reviewDelete = productModel.findByIdAndUpdate(pId, {
-          $pull: { pRatingsReviews: { _id: rId } },
-        });
-        reviewDelete.exec((err, result) => {
-          if (err) {
-            console.log(err);
-          }
-          return res.json({ success: "Your review is deleted" });
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
 }
+
 
 
 const productController = new Product();

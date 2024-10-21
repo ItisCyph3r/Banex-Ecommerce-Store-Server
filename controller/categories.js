@@ -139,6 +139,32 @@ class Category {
     }
   }
 
+  // async getAllCategory(req, res) {
+  //   try {
+  //     let Categories = await categoryModel.find({}).sort({ _id: -1 });
+
+  //     if (Categories) {
+  //       // Define the transformation (e.g., cropping to 1920x1080)
+  //       const transformation = "c_crop,w_1920,h_1080";
+
+  //       // Modify the image URLs for each category
+  //       Categories = Categories.map(category => {
+  //         if (category.cImage.url) {
+  //           const parts = category.cImage.url.split('/upload/');
+  //           category.cImage.url = `${parts[0]}/upload/${transformation}/${parts[1]}`;
+  //           console.log(category.cImage.url)
+  //         }
+  //         return category;
+  //       });
+
+  //       return res.json({ Categories });
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(500).json({ error: "Server error" });
+  //   }
+  // }
+
   async postAddCategory(req, res) {
     let { cName, cDescription, cStatus } = req.body;
     let cImage = req.file; // This is now the file uploaded to Cloudinary
